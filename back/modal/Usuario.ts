@@ -1,3 +1,4 @@
+import { json } from 'express';
 import { client,dbQuery}from './../database';
 
 export class Usuario {
@@ -88,7 +89,24 @@ export class Usuario {
         }
         return null;
     }
+    static async listAll():Promise<Usuario[]>{
 
+        let sql = `SELECT * FROM "usuario" ORDER BY id`;
+        let result = await dbQuery(sql);
+        let usuarios : Usuario[] = [];
+
+        for(let i = 0; i < result.length; i++){
+            let usuario = new Usuario();
+            Object.assign(usuario, json);
+            usuarios.push(usuario);
+
+        }
+
+        return usuarios;
+
+    }
+
+    
     
 
 };
