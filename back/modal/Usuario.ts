@@ -10,7 +10,7 @@ export class Usuario {
 
     public async insert():Promise<Usuario|null>{
         let sql = `INSERT INTO "usuario" ("id" , "nome" , "email" , "senha")
-         VALUES("$1",$2,$3,$4) RETURNING id;`;
+         VALUES($1,$2,$3,$4) RETURNING id;`;
 
         let params = [
             this.id,

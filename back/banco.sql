@@ -21,6 +21,7 @@ CREATE TABLE adicional (
 CREATE TABLE pedido (
   id SERIAL PRIMARY KEY,
   usuario_id INTEGER REFERENCES usurio(id),
+  produto_id INTEGER REFERENCES produto(id),
   data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
