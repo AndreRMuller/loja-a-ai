@@ -8,11 +8,11 @@ export class Produto {
     preco: number;
 
     public async insert():Promise<Produto|null>{
-        let sql = `INSERT INTO "produto" ("id", "tamanho", "preco")
-        VALUES ($1,$2,$3) RETURNING id;`
+        let sql = `INSERT INTO "produto" ("tamanho", "preco")
+        VALUES ($1,$2) RETURNING id;`
 
         let params = [
-            this.id,
+            
             this.tamanho,
             this.preco
         ];

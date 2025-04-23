@@ -9,17 +9,17 @@ export class Pedido {
     id: number;
     id_usuario: number;
     id_produto: number;
-    data_criacaoata: Date;
+    data_criacao: Date;
 
     public async insert():Promise<Pedido|null>{
-        let sql = `INSERT INTO "pedido" ("id", "id_usuario", "id_produto", "data_criacaoata")
-        VALUES ($1,$2, $3, $4) RETURNING id;`
+        let sql = `INSERT INTO "pedido" ("id_usuario", "id_produto", "data_criacao")
+        VALUES ($1,$2, $3) RETURNING id;`
 
         let params = [
-            this.id,
+            
             this.id_usuario,
             this.id_produto,
-            this.data_criacaoata
+            this.data_criacao
         ];
 
         let result = await dbQuery(sql, params);

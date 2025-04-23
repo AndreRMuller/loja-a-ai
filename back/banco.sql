@@ -14,13 +14,13 @@ CREATE TABLE produto (
 );
 
 CREATE TABLE adicional (
-    id SERIAL PRIMARY KEY,
+    id SERIAL PRIMARY KEY
     nome VARCHAR(100) NOT NULL
 );
 
 CREATE TABLE pedido (
   id SERIAL PRIMARY KEY,
-  usuario_id INTEGER REFERENCES usurio(id),
+  usuario_id INTEGER REFERENCES usuario(id),
   produto_id INTEGER REFERENCES produto(id),
   data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
