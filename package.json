@@ -21,12 +21,14 @@
   },
   "homepage": "https://github.com/AndreRMuller/loja-a-ai#readme",
   "devDependencies": {
-  
+    "@types/express": "^5.0.1",
     "@types/pg": "^8.11.11",
-    "typescript": "^5.7.3"
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
   },
   "dependencies": {
-    "pg": "^8.13.2"
-
+    "express": "^5.1.0",
+    "pg": "^8.13.2",
+    "request": "^2.88.2"
   }
 }
