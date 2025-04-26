@@ -31,11 +31,8 @@ export class Pedido {
         
         }
         
-        
         return null;
 
     }
-
-
     
-}
+};

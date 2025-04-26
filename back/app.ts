@@ -1,13 +1,19 @@
-
+//npm install express
+//npm install @types/express
+//npm install cors
+//npm install @types/cors
+//npm install pg
+//npm install @types/pg
 import express, { Express, Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import { Usuario } from './modal/Usuario';
 import { Produto } from './modal/produto';
+import { Pedido } from './modal/pedido';
 import { client, dbQuery } from './database';
 
 
-const port: Number = 3000;
-let server: Express = express();
+const port = 3000; // sem `: Number`
+const server = express(); // sem `: Express`
 
 server.use(cors());
 server.use(express.json());
@@ -34,21 +40,20 @@ server.use(express.json());
         return res.status(401).json(erro);
     }); 
 
-server.get('/login', async (req: Request, res: Response): Promise<Response> =>  
-        {
+server.get('/login', async (req: Request, res: Response) => {
             let resultado = { "id": null, "resultado" : "Login okay" };
         
             return res.status(200).json(resultado);
         });
 
-server.get('/usuario',  async (req: Request, res: Response): Promise<Response> => 
+server.get('/usuario',  async (req: Request, res: Response)  => 
             {
                 let usuarios = await Usuario.listAll();
             
                 return res.status(200).json(usuarios);
             });
 
- server.get('/usuario/:id', async (req: Request, res: Response): Promise<Response> => 
+ server.get('/usuario/:id', async (req: Request, res: Response)  => 
                 {
                     let id = Number(req.params.id);
                     let usuario = await Usuario.findOneById(id);
@@ -62,7 +67,6 @@ server.get('/usuario',  async (req: Request, res: Response): Promise<Response> =
                 
                     return res.status(400).json(erro);
                 });
-
 
  server.listen(port, () =>
     {
