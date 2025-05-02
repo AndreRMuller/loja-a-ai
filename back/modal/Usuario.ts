@@ -32,7 +32,7 @@ export class Usuario {
 
     }
 
-    public async Update():Promise<Usuario|null>{
+    public async update():Promise<Usuario|null>{
 
         let sql = `UPDATE "usuario" SET "nome" = $1, "senha" = $2 WHERE "id" = $3 ;`
 
@@ -54,14 +54,14 @@ export class Usuario {
     public async save():Promise<Usuario|null>{
 
         if(this.id){
-            return await this.Update();
+            return await this.update();
         }
 
         return await this.insert() ;
     }
 
 
-    public async Delete():Promise<Usuario|null>{
+    public async delete():Promise<Usuario|null>{
 
         let sql = `DELETE FROM "usuario" WHERE "id" = $1 RETURNING id;`
 

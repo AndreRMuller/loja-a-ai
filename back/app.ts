@@ -68,6 +68,93 @@ server.get('/usuario',  async (req: Request, res: Response)  =>
                     return res.status(400).json(erro);
                 });
 
+                server.post('/usuario', async (req: Request, res: Response): Promise<Response> => 
+                    {
+                        let usuario = new Usuario();
+                        usuario.nome = req.body.nome;
+                        usuario.email = req.body.email;
+                        usuario.senha = req.body.senha;
+                       
+                    
+                        let erros : string[] = usuario.validate();
+                    
+                        if (erros.length > 0)
+                        {
+                            let json = {"erros":erros};
+                            return res.status(400).json(json);
+                        }
+                    
+                        await usuario.insert();
+                    
+                        if (usuario.id)
+                        {
+                            return res.status(200).json(usuario);    
+                        }
+                    
+                        let erro = { "id": null, "erro" : "Erro ao inserir usuario." };
+                    
+                        return res.status(400).json(erro);
+                    });
+
+                    server.put('/usuario/:id', async (req: Request, res: Response): Promise<Response> => 
+                        {
+                            let id = Number(req.params.id);
+                            let usuario = await Usuario.findOneById(id);
+                        
+                            if (usuario == null)
+                            {
+                                let erro = { "id": id, "erro" : "usuario não encontrada." };
+                                return res.status(400).json(erro);
+                            }
+                        
+                            usuario.nome = req.body.nome;
+                            usuario.email = req.body.email;
+                            usuario.senha = req.body.senha;
+                            
+                          
+                            console.log(usuario);
+                        
+                            let erros : string[] = usuario.validate();
+                        
+                            if (erros.length > 0)
+                            {
+                                let json = {"erros":erros};
+                                return res.status(400).json(json);
+                            }
+                        
+                            usuario.update();
+                        
+                            if ( usuario.id)
+                            {
+                                return res.status(200).json(usuario);    
+                            }
+                        
+                            let erro = { "id": id, "erro" : "Erro ao editar usuario." };
+                            return res.status(400).json(erro);
+                        });
+
+                        server.delete('/usuario/:id', async (req: Request, res: Response): Promise<Response> => 
+                            {
+                                let id = Number(req.params.id);
+                                let usuario = await Usuario.findOneById(id);
+                            
+                                await usuario?.delete();
+                            
+                                let retorno = {"okay" : true };
+                                return res.status(200).json(usuario);
+                            });
+
+                            server.get('/produto/', async (req: Request, res: Response): Promise<Response> => 
+                                {
+                                    let produto = await produto.findAll();
+                                
+                                    return res.status(200).json(produto);
+                                });
+
+
+
+                
+
  server.listen(port, () =>
     {
        console.log('Server iniciado na porta ' + port );
