@@ -8,6 +8,28 @@ export class Usuario {
     email: string;
     senha: string;
 
+    validate() : string[] {
+
+        let errors:string[] = [];
+
+        if ( this.nome.length == 0)
+            {
+                errors.push("Nome é obrigatório.");
+            }
+
+        if ( this.email.length == 0)
+            {
+                errors.push("Nome é obrigatório.");
+            }
+        if ( this.senha.length == 0)
+            {
+                errors.push("Nome é obrigatório.");
+            }
+         
+        return errors;
+      
+    }
+
     public async insert():Promise<Usuario|null>{
         let sql = `INSERT INTO "usuario" ( "nome" , "email" , "senha")
          VALUES($1,$2,$3) RETURNING id;`;
