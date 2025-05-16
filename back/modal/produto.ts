@@ -31,7 +31,7 @@ export class Produto {
 
     }
 
-    public async Update():Promise<Produto|null>{
+    public async update():Promise<Produto|null>{
 
         let sql = `UPDATE "produto" SET "tamanho" = 1$ "preco" = 2$ WHERE "id" = 3$;`
 
@@ -53,13 +53,13 @@ export class Produto {
     public async save():Promise<Produto|null>{
 
         if(this.id){
-            return await this.Update();
+            return await this.update();
         }
 
         return await this.insert() ;
     }
 
-    public async Delete():Promise<Produto|null>{
+    public async delete():Promise<Produto|null>{
     
             let sql = `DELETE FROM "produto" WHERE "id" = $1 RETURNING id;`
     
