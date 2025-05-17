@@ -14,7 +14,7 @@ CREATE TABLE produto (
 );
 
 CREATE TABLE adicional (
-    id SERIAL PRIMARY KEY
+    id SERIAL PRIMARY KEY,
     nome VARCHAR(100) NOT NULL
 );
 
