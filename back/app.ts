@@ -11,6 +11,9 @@ import { Produto } from './modal/produto';
 import { Pedido } from './modal/pedido';
 import { client, dbQuery } from './database';
 
+const usuarios = [
+  { nome: 'bonfa', senha: '123456' }
+];
 
 const port = 3000; // sem `: Number`
 const server = express(); // sem `: Express`
@@ -18,32 +21,15 @@ const server = express(); // sem `: Express`
 server.use(cors());
 server.use(express.json());
 
- server.use((req: Request, res: Response, next: NextFunction) => 
-    {
-        console.log('[' + (new Date()) + '] ' + req.method + ' ' + req.url);
-        console.log('user='+req.get('user'));
-        console.log('password='+req.get('password'));
-    
-        let user = req.get('user');
-        let password = req.get('password');
-    
-        //todo fazer consulta no banco
-        //login com sucesso
-        if (user == 'bonfa' && password == '123456')
-        {
-            next();
-            return;
-        }
-    
-        let erro = { "id": null, "erro" : "Falha na autenticação" };
-    
-        return res.status(401).json(erro);
-    }); 
 
-server.get('/login', async (req: Request, res: Response) => {
-    let resultado = { "id": null, "resultado" : "Login okay" };
+server.post('/login', (req: Request, res: Response) => {
+  const { user, password } = req.body;
 
-    return res.status(200).json(resultado);
+  if (user === 'bonfa' && password === '123456') {
+    return res.status(200).json({ id: 1, resultado: 'Login okay' });
+  }
+
+  return res.status(401).json({ id: null, erro: 'Falha na autenticação' });
 });
 
 server.get('/usuario',  async (req: Request, res: Response)  => 
@@ -221,7 +207,10 @@ server.delete('/produto/:id', async (req: Request, res: Response): Promise<Respo
     return res.status(200).json(produto);
 });
 
- 
+ server.post('/teste', (req: Request, res: Response) => {
+  console.log('corpo recebido:', req.body);
+  res.json({ recebido: req.body });
+});
 
 
  server.listen(port, () =>

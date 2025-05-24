@@ -12,18 +12,18 @@ export class Usuario {
 
         let errors:string[] = [];
 
-        if ( this.nome.length == 0)
+       if (!this.nome || this.nome.trim().length == 0)
             {
                 errors.push("Nome é obrigatório.");
             }
 
-        if ( this.email.length == 0)
+       if (!this.email || this.email.trim().length == 0)
             {
-                errors.push("Nome é obrigatório.");
+                errors.push("email é obrigatório.");
             }
-        if ( this.senha.length == 0)
+       if (!this.senha || this.senha.trim().length == 0)
             {
-                errors.push("Nome é obrigatório.");
+                errors.push("senha é obrigatório.");
             }
          
         return errors;
@@ -31,7 +31,7 @@ export class Usuario {
     }
 
     public async insert():Promise<Usuario|null>{
-        let sql = `INSERT INTO "usuario" ( "nome" , "email" , "senha")
+        let sql = `INSERT INTO "usuario" ("nome" , "email" , "senha")
          VALUES($1,$2,$3) RETURNING id;`;
 
         let params = [
@@ -47,22 +47,26 @@ export class Usuario {
             
             this.id = result[0].id;
             return this;
-        
         }
 
          return null;
+          } catch (err: any) {
+        if (err.code === '23505') {
+            throw new Error('E-mail já está cadastrado.');
+        }
+        throw err;
 
     }
 
     public async update():Promise<Usuario|null>{
 
-        let sql = `UPDATE "usuario" SET "nome" = $1, "senha" = $2 WHERE "id" = $3 ;`
+        let sql = `UPDATE "usuario" SET "nome" = $1, "email" = $2, "senha" = $3 WHERE "id" = $4;`
 
-        let params = [
-            this.nome,
+        let params = [this.nome,
+            this.email,
             this.senha,
             this.id
-        ];
+            ];
 
         let result = await dbQuery(sql, params);
 
@@ -119,7 +123,7 @@ export class Usuario {
 
         for(let i = 0; i < result.length; i++){
             let usuario = new Usuario();
-            Object.assign(usuario, json);
+            Object.assign(usuario, result[i]);
             usuarios.push(usuario);
 
         }
