@@ -207,11 +207,12 @@ server.delete('/produto/:id', async (req: Request, res: Response): Promise<Respo
     return res.status(200).json(produto);
 });
 
- server.post('/teste', (req: Request, res: Response) => {
-  console.log('corpo recebido:', req.body);
-  res.json({ recebido: req.body });
-});
+server.get('/pedido/', async (req: Request, res: Response): Promise<Response> => {
 
+     let pedidos = await Pedido.listAll();
+
+    return res.status(200).json(pedidos);
+})
 
  server.listen(port, () =>
     {
