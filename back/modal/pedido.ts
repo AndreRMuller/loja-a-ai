@@ -6,34 +6,53 @@ import { Produto } from './produto';
 
 export class Pedido {
 
-    id: number;
-    id_usuario: number;
-    id_produto: number;
-    data_criacao: Date;
+ id: number;
+  usuario_id: number;
+  data_criacao: Date;
+  produtos: { id: number; nome: string; preco: string; quantidade: number }[];
 
-    public async insert():Promise<Pedido|null>{
-        let sql = `INSERT INTO "pedido" ("id_usuario", "id_produto", "data_criacao")
-        VALUES ($1,$2, $3) RETURNING id;`
+  // Função que busca todos os pedidos e produtos de um usuário
+  static async listByUsuario(id_usuario: number): Promise<Pedido[]> {
+    let sql = `
+      SELECT 
+        p.id AS pedido_id,
+        p.data_criacao,
+        pr.id AS produto_id,
+        pr.nome,
+        pr.preco,
+        pp.quantidade
+      FROM pedido p
+      JOIN pedido_produto pp ON p.id = pp.id_pedido
+      JOIN produto pr ON pr.id = pp.id_produto
+      WHERE p.id_usuario = $1
+      ORDER BY p.data_criacao DESC;
+    `;
 
-        let params = [
-            
-            this.id_usuario,
-            this.id_produto,
-            this.data_criacao
-        ];
+    let result = await dbQuery(sql, [id_usuario]);
 
-        let result = await dbQuery(sql, params);
+    let pedidosMap = new Map<number, Pedido>();
 
-        if(result.length > 0) {
-            
-            this.id = result[0].id;
-            return this;
-        
-        }
-        
-        return null;
-
+    for (let row of result) {
+      let pedido = pedidosMap.get(row.pedido_id);
+      if (!pedido) {
+        pedido = new Pedido();
+        pedido.id = row.pedido_id;
+        pedido.usuario_id = id_usuario;
+        pedido.data_criacao = row.data_criacao;
+        pedido.produtos = [];
+        pedidosMap.set(row.pedido_id, pedido);
+      }
+      pedido.produtos.push({
+        id: row.produto_id,
+        nome: row.nome,
+        preco: row.preco,
+        quantidade: row.quantidade,
+      });
     }
+
+    return Array.from(pedidosMap.values());
+  }
+
 
    public async delete():Promise<Pedido|null>{
 
@@ -66,21 +85,49 @@ export class Pedido {
     }
     
 
-    static async listAll():Promise<Pedido[]>{
+    static async listAll(): Promise<Pedido[]> {
+  const sql = `
+    SELECT
+      p.id AS pedido_id,
+      p.usuario_id,
+      p.data_criacao,
+      pr.id AS produto_id,
+      pr.nome,
+      pr.preco,
+      pp.quantidade
+    FROM pedido p
+    LEFT JOIN pedido_produto pp ON p.id = pp.id_pedido
+    LEFT JOIN produto pr ON pp.id_produto = pr.id
+    ORDER BY p.id, pr.nome;
+  `;
 
-        let sql = `SELECT * FROM "pedido" ORDER BY id`;
-        let result = await dbQuery(sql);
-        let pedidos : Pedido[] = [];
+  const result = await dbQuery(sql);
 
-        for(let i = 0; i < result.length; i++){
-            let pedido = new Pedido();
-            Object.assign(pedido, result[i]);
-            pedidos.push(pedido);
+  const pedidosMap = new Map<number, Pedido>();
 
-        }
-
-        return pedidos;
-
+  for (const row of result) {
+    let pedido = pedidosMap.get(row.pedido_id);
+    if (!pedido) {
+      pedido = new Pedido();
+      pedido.id = row.pedido_id;
+      pedido.usuario_id = row.usuario_id; // <-- aqui também muda para usuario_id no seu model
+      pedido.data_criacao = row.data_criacao;
+      pedido.produtos = [];
+      pedidosMap.set(row.pedido_id, pedido);
     }
+
+    if (row.produto_id) {
+      pedido.produtos.push({
+        id: row.produto_id,
+        nome: row.nome,
+        preco: row.preco,
+        quantidade: row.quantidade,
+      });
+    }
+  }
+
+  return Array.from(pedidosMap.values());
+}
+
     
 };

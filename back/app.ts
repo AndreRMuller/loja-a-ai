@@ -4,7 +4,7 @@
 //npm install @types/cors
 //npm install pg
 //npm install @types/pg
-import express, { Express, Request, Response, NextFunction } from 'express';
+import express, { Express, Request, Response, NextFunction, request, response } from 'express';
 import cors from 'cors';
 import { Usuario } from './modal/Usuario';
 import { Produto } from './modal/produto';
@@ -154,6 +154,7 @@ server.get('/produto/:id', async(req: Request, res: Response): Promise<Response>
 server.post('/produto', async (req: Request, res: Response): Promise<Response> => 
     {
         let produto = new Produto();
+        produto.nome = req.body.nome;
         produto.tamanho = req.body.tamanho;
         produto.preco = req.body.preco;
         
@@ -180,6 +181,7 @@ server.put('/produto/:id', async (req: Request, res: Response): Promise<Response
         return res.status(400).json(erro);
     }
 
+    produto.nome = req.body.nome;
     produto.tamanho = req.body.tamanho;
     produto.preco = req.body.preco;
     
@@ -207,12 +209,44 @@ server.delete('/produto/:id', async (req: Request, res: Response): Promise<Respo
     return res.status(200).json(produto);
 });
 
-server.get('/pedido/', async (req: Request, res: Response): Promise<Response> => {
+server.get('/pedido', async (req: Request, res: Response): Promise<Response> => {
+  const pedidos = await Pedido.listAll();
+  return res.status(200).json(pedidos);
+});
 
-     let pedidos = await Pedido.listAll();
+server.get('/pedido/usuario/:id', async (req: Request, res: Response): Promise<Response> => {
+  const id_usuario = Number(req.params.id);
+  const pedidos = await Pedido.listByUsuario(id_usuario);
+  return res.status(200).json(pedidos);
+});
 
-    return res.status(200).json(pedidos);
+server.get('/pedido/:id', async (req: Request, res: Response): Promise<Response> => {
+     let id = Number(req.params.id);
+    let pedido = await Pedido.findOneById(id);
+
+    if ( pedido != null)
+    {
+        return res.status(200).json(pedido);
+    }
+
+    let erro = { "id": id, "erro" : "pedido não encontrada." };
+
+    return res.status(400).json(erro);
+
 })
+
+server.delete('/pedido/:id', async (req: Request, res: Response): Promise<Response> => {
+  
+    let id = Number(req.params.id);
+    let pedido = await Pedido.findOneById(id);
+
+    await pedido?.delete();
+
+    let retorno = {"okay" : true };
+    return res.status(200).json(pedido);
+
+})
+
 
  server.listen(port, () =>
     {

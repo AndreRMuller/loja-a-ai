@@ -4,15 +4,17 @@ import { client,dbQuery}from './../database';
 export class Produto {
 
     id: number;
+    nome: string;
     tamanho: string;
     preco: number;
 
     public async insert():Promise<Produto|null>{
-        let sql = `INSERT INTO "produto" ("tamanho", "preco")
-        VALUES ($1,$2) RETURNING id;`
+        let sql = `INSERT INTO "produto" ("nome","tamanho", "preco")
+        VALUES ($1,$2,$3) RETURNING id;`
 
         let params = [
             
+            this.nome,
             this.tamanho,
             this.preco
         ];
@@ -33,9 +35,10 @@ export class Produto {
 
     public async update():Promise<Produto|null>{
 
-        let sql = `UPDATE "produto" SET "tamanho" = 1$ "preco" = 2$ WHERE "id" = 3$;`
+        let sql = `UPDATE "produto" SET "nome" = $1, "tamanho" = $2, "preco" = $3 WHERE "id" = $4;`
 
         let params = [
+            this.nome,
             this.tamanho,
             this.preco,
             this.id
@@ -96,7 +99,7 @@ export class Produto {
     
             for(let i = 0; i < result.length; i++){
                 let produto = new Produto();
-                Object.assign(produto, json);
+                Object.assign(produto,result[i]);
                 produtos.push(produto);
     
             }
