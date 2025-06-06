@@ -1,5 +1,6 @@
 import { json } from 'express';
 import { client,dbQuery}from './../database';
+import { Pedido } from './pedido';
 
 export class Usuario {
 
@@ -60,7 +61,7 @@ export class Usuario {
 
     public async update():Promise<Usuario|null>{
 
-        let sql = `UPDATE "usuario" SET "nome" = $1, "email" = $2, "senha" = $3 WHERE "id" = $4;`
+        let sql = `UPDATE "usuario" SET "nome" = $1, "email" = $2, "senha" = $3 WHERE "id" = $4 RETURNING *;`
 
         let params = [this.nome,
             this.email,
@@ -70,7 +71,7 @@ export class Usuario {
 
         let result = await dbQuery(sql, params);
 
-        if(result) {
+        if(result.length > 0) {
             return this;
         }
 
@@ -131,8 +132,16 @@ export class Usuario {
         return usuarios;
 
     }
-
+   async listPedidos(): Promise<Pedido[]> {
+    return await Pedido.listByUsuario(this.id);
+  }
     
-    
+    async criarPedido(): Promise<Pedido> {
+  let pedido = new Pedido();
+  pedido.usuario_id = this.id;      // vincula pedido ao usuário
+  pedido.data_criacao = new Date(); // data atual
+  await pedido.insert();             // método pra salvar no banco (precisa criar no Pedido)
+  return pedido;
+}
 
 };

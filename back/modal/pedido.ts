@@ -1,5 +1,5 @@
 import { json } from 'express';
-import { client,dbQuery}from './../database';
+import { client,dbQuery}from '../database';
 import { Usuario } from './Usuario';
 import { Produto } from './produto';
 
@@ -9,10 +9,10 @@ export class Pedido {
  id: number;
   usuario_id: number;
   data_criacao: Date;
-  produtos: { id: number; nome: string; preco: string; quantidade: number }[];
+  produtos: { id: number; nome: string; preco: number; quantidade: number }[];
 
   // Função que busca todos os pedidos e produtos de um usuário
-  static async listByUsuario(id_usuario: number): Promise<Pedido[]> {
+  static async listByUsuario(usuario_id: number): Promise<Pedido[]> {
     let sql = `
       SELECT 
         p.id AS pedido_id,
@@ -24,11 +24,11 @@ export class Pedido {
       FROM pedido p
       JOIN pedido_produto pp ON p.id = pp.id_pedido
       JOIN produto pr ON pr.id = pp.id_produto
-      WHERE p.id_usuario = $1
+      WHERE p.usuario_id = $1
       ORDER BY p.data_criacao DESC;
     `;
 
-    let result = await dbQuery(sql, [id_usuario]);
+    let result = await dbQuery(sql, [usuario_id]);
 
     let pedidosMap = new Map<number, Pedido>();
 
@@ -37,7 +37,7 @@ export class Pedido {
       if (!pedido) {
         pedido = new Pedido();
         pedido.id = row.pedido_id;
-        pedido.usuario_id = id_usuario;
+        pedido.usuario_id = usuario_id;
         pedido.data_criacao = row.data_criacao;
         pedido.produtos = [];
         pedidosMap.set(row.pedido_id, pedido);
@@ -128,6 +128,27 @@ export class Pedido {
 
   return Array.from(pedidosMap.values());
 }
+public async insert(): Promise<Pedido | null> {
+  const sql = `INSERT INTO pedido (usuario_id, data_criacao) VALUES ($1, $2) RETURNING id;`;
+  const params = [this.usuario_id, this.data_criacao];
 
+  const result = await dbQuery(sql, params);
+
+  if (result.length > 0) {
+    this.id = result[0].id;
+    return this;
+  }
+  return null;
+}
+
+public async addProduto(produto_id: number, quantidade: number): Promise<void> {
+  const sql = `
+    INSERT INTO pedido_produto (id_pedido, id_produto, quantidade)
+    VALUES ($1, $2, $3)
+    ON CONFLICT (id_pedido, id_produto)
+    DO UPDATE SET quantidade = pedido_produto.quantidade + EXCLUDED.quantidade;
+  `;
+  await dbQuery(sql, [this.id, produto_id, quantidade]);
+}
     
 };

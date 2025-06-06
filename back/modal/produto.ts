@@ -1,5 +1,5 @@
 import { json } from 'express';
-import { client,dbQuery}from './../database';
+import { client,dbQuery}from '../database';
 
 export class Produto {
 
@@ -35,7 +35,7 @@ export class Produto {
 
     public async update():Promise<Produto|null>{
 
-        let sql = `UPDATE "produto" SET "nome" = $1, "tamanho" = $2, "preco" = $3 WHERE "id" = $4;`
+        let sql = `UPDATE "produto" SET "nome" = $1, "tamanho" = $2, "preco" = $3 WHERE "id" = $4 RETURNING *;`
 
         let params = [
             this.nome,
@@ -108,7 +108,6 @@ export class Produto {
     
         }
 
-    
-    
+  
 }
 
