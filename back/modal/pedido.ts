@@ -1,7 +1,7 @@
 import { json } from 'express';
 import { client,dbQuery}from '../database';
 import { Usuario } from './Usuario';
-import { Produto } from './produto';
+import { Produto } from './Produto';
 
 
 export class Pedido {
@@ -11,7 +11,6 @@ export class Pedido {
   data_criacao: Date;
   produtos: { id: number; nome: string; preco: number; quantidade: number }[];
 
-  // Função que busca todos os pedidos e produtos de um usuário
   static async listByUsuario(usuario_id: number): Promise<Pedido[]> {
     let sql = `
       SELECT 
@@ -110,7 +109,7 @@ export class Pedido {
     if (!pedido) {
       pedido = new Pedido();
       pedido.id = row.pedido_id;
-      pedido.usuario_id = row.usuario_id; // <-- aqui também muda para usuario_id no seu model
+      pedido.usuario_id = row.usuario_id; 
       pedido.data_criacao = row.data_criacao;
       pedido.produtos = [];
       pedidosMap.set(row.pedido_id, pedido);

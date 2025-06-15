@@ -7,16 +7,16 @@
 import express, { Express, Request, Response, NextFunction, request, response } from 'express';
 import cors from 'cors';
 import { Usuario } from './modal/Usuario';
-import { Produto } from './modal/produto';
-import { Pedido } from './modal/pedido';
+import { Produto } from './modal/Produto';
+import { Pedido } from './modal/Pedido';
 import { client, dbQuery } from './database';
 
 const usuarios = [
   { nome: 'bonfa', senha: '123456' }
 ];
 
-const port = 3000; // sem `: Number`
-const server = express(); // sem `: Express`
+const port = 3000; 
+const server = express(); 
 
 server.use(cors());
 server.use(express.json());

@@ -1,6 +1,6 @@
 import { json } from 'express';
 import { client,dbQuery}from './../database';
-import { Pedido } from './pedido';
+import { Pedido } from './Pedido';
 
 export class Usuario {
 
@@ -138,9 +138,9 @@ export class Usuario {
     
     async criarPedido(): Promise<Pedido> {
   let pedido = new Pedido();
-  pedido.usuario_id = this.id;      // vincula pedido ao usuário
-  pedido.data_criacao = new Date(); // data atual
-  await pedido.insert();             // método pra salvar no banco (precisa criar no Pedido)
+  pedido.usuario_id = this.id;   
+  pedido.data_criacao = new Date(); 
+  await pedido.insert();             
   return pedido;
 }
 
