@@ -1,0 +1,41 @@
+<html>
+    <head>
+        <title>Adicionar cadastro</title>
+    </head>
+    <body style="font-family: Arial;">
+        <h1 id="h1">Adicionar cadastro</h1>
+        <label for="nome" style="display:inline-block;width:100px">Nome</label>
+        <input id="nome" />
+        <br/>
+        <br/>
+        <label for="cpf" style="display:inline-block;width:100px">CPF</label>
+        <input id="cpf" maxlength="11" />
+        <br/>
+        <br/>
+        <label for="idade" style="display:inline-block;width:100px">Idade</label>
+        <input id="idade" />
+        <br/>
+        <br/>
+        <label for="siglaUf" style="display:inline-block;width:100px">UF</label>
+        <select id="siglaUf" >
+        </select>
+        <br/>
+        <br/>
+        <label for="cidade" style="display:inline-block;width:100px">Cidade</label>
+        <input id="cidade" />
+        <br/>
+        <br/>
+        <button onclick="gravarUsuario()">Gravar usuario</button>
+    </body>
+    <script src="usuario.js"></script>
+    <script>
+        async function start()
+        {
+            verificaLogin();
+            await carregarEstados();
+            carregarUsuario();
+          
+        }
+        start();
+    </script>
+</html>

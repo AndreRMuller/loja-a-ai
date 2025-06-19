@@ -1,0 +1,29 @@
+<html>
+    <head>
+        <title>Sistema de cadastro</title>
+    </head>
+    <body style="font-family: Arial;">
+        <h1>Sistema de cadastro</h1>
+    </body>
+    <label>Usuário</label>
+    <input type="text" id="user"/>
+    <br/>
+    <br/>
+    <label>Senha</label>
+    <input type="text" id="password"/>
+    <br/>
+    <button onclick="login()">Login</button>
+    <script src="usuario.js"></script>
+    <script>
+        async function verifica()
+        {
+            let resultado = await buscarLogin(user, password);
+
+            if (resultado)
+            {
+                window.location = "index.html";   
+            }
+        }
+        verifica();
+    </script>
+</html>

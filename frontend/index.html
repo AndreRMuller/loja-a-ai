@@ -1,0 +1,29 @@
+<html>
+    <head>
+        <title>Sistema de cadastro</title>
+    </head>
+    <body style="font-family: Arial;">
+        <h1>Sistema de cadastro</h1>
+        <a href="usuario.js">Adicionar usuario</a>
+        <br/>
+        <br/>
+        <table border="1" style="border-collapse: collapse;width:800px">
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>E-mail</th>
+                    <th>Pedidos</th>
+                  
+                </tr>
+            </thead>
+            <tbody id="tbody-pessoas">
+
+            </tbody>
+        </table>
+        <script src="usuario.js"></script>
+        <script>
+            verificaLogin();
+            listarUsuario();
+        </script>
+    </body>
+</html>
