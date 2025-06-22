@@ -210,17 +210,27 @@ server.delete('/produto/:id', async (req: Request, res: Response): Promise<Respo
 });
 
 server.get('/pedido', async (req: Request, res: Response): Promise<Response> => {
+
   const pedidos = await Pedido.listAll();
+
   return res.status(200).json(pedidos);
 });
 
 server.get('/pedido/usuario/:id', async (req: Request, res: Response): Promise<Response> => {
+
   const id_usuario = Number(req.params.id);
+
   const pedidos = await Pedido.listByUsuario(id_usuario);
+
+   for (let pedido of pedidos) {
+    pedido.produtos = await Pedido.buscarProdutos(pedido.id);
+  }
+
   return res.status(200).json(pedidos);
 });
 
 server.get('/pedido/:id', async (req: Request, res: Response): Promise<Response> => {
+
      let id = Number(req.params.id);
     let pedido = await Pedido.findOneById(id);
 
@@ -233,7 +243,19 @@ server.get('/pedido/:id', async (req: Request, res: Response): Promise<Response>
 
     return res.status(400).json(erro);
 
-})
+});
+
+server.post('/pedido', async (req: Request, res: Response): Promise<Response> => {
+  const { usuario_id } = req.body;
+
+  const pedido = await Pedido.criar(usuario_id);
+
+  if (pedido && pedido.id) {
+    return res.status(200).json(pedido);
+  }
+
+  return res.status(400).json({ erro: 'Erro ao criar pedido' });
+});
 
 server.delete('/pedido/:id', async (req: Request, res: Response): Promise<Response> => {
   
@@ -245,7 +267,20 @@ server.delete('/pedido/:id', async (req: Request, res: Response): Promise<Respon
     let retorno = {"okay" : true };
     return res.status(200).json(pedido);
 
-})
+});
+
+server.post('/pedido/:id/produto', async (req: Request, res: Response) => {
+  const pedido_id = Number(req.params.id);
+  const { produto_id, quantidade } = req.body;
+
+  const pedido = await Pedido.findOneById(pedido_id);
+  if (!pedido) {
+    return res.status(404).json({ erro: 'Pedido não encontrado' });
+  }
+
+  await pedido.addProduto(produto_id, quantidade);
+  return res.status(200).json({ okay: true });
+});
 
 
  server.listen(port, () =>

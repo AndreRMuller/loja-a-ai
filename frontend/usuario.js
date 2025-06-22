@@ -12,340 +12,213 @@ async function verificaLogin()
     }
 }
 
-async function buscarLogin(user, password)
-{
-    const myHeaders = new Headers();
-    myHeaders.append("Content-Type", "application/json");
-    myHeaders.append('user', user);
-    myHeaders.append('password', password);
+async function buscarLogin(user, password) {
+  const response = await fetch(apiUrl + "/login", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ user, password }),
+  });
 
-    const options = {
-        method: 'GET',
-        headers: myHeaders
-    };
+  const resultado = await response.json();
 
-    let result = await fetch(apiUrl+"/login", options);
-    let resultado = await result.json();
-    console.log(resultado);
-
-    if (resultado.resultado == 'Login okay')
-    {
-        return true;
-    }
-
-    return false;
+  if (resultado.resultado === "Login okay") {
+    return true;
+  }
+  return false;
 }
 
-async function login()
-{
-    let user = document.getElementById('user').value;
-    let password = document.getElementById('password').value;
+async function login() {
+  let user = document.getElementById("user").value;
+  let password = document.getElementById("password").value;
 
-    console.log('user='+user);
-    console.log('password='+password);
-    
-    let resultado = await buscarLogin(user, password);
+  const response = await fetch(apiUrl + "/login", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ user, password }),
+  });
 
-    if (resultado)
-    {
-        window.location = 'index.html';
-        localStorage.setItem('user', user);
-        localStorage.setItem('password', password);
-    }
-    else
-    {
-        alert("Falha no login!");
-    }
+  const resultado = await response.json();
+
+  if (resultado.resultado === "Login okay") {
+    localStorage.setItem("user", user);
+    localStorage.setItem("password", password);
+    localStorage.setItem("usuario_id", resultado.id);
+  } else {
+    alert("Falha no login!");
+  }
 }
 
-async function listarUsuario()
-{
-    const myHeaders = new Headers();
-    myHeaders.append('user', user);
-    myHeaders.append('password', password);
+async function listarUsuario() {
+  const headers = new Headers();
+  headers.append('user', user);
+  headers.append('password', password);
 
-    const options = {
-        headers: myHeaders,
-        method: "GET",
-        redirect: "follow"
-    };
-      
-    let result = await fetch(apiUrl+"/usuario", options);
-    let pessoas = await result.json();
-    let html = '';
+  const response = await fetch(apiUrl + "/usuario", {
+    method: "GET",
+    headers: headers
+  });
 
-    for (let i=0; i < pessoas.length; i++)
-    {
-        let pessoa = pessoas[i];
+  const usuarios = await response.json();
 
-        if (!pessoa)
-        {
-            continue;
-        }
+  let html = "";
 
-        let excluir = `<button onclick="excluirUsuario(${pessoa.id})">Excluir</button>`;
-        let editar = `<button onclick="editarUsuario(${pessoa.id})">Editar</button>`;
-        let viagemBtn = `<button onclick="addViagem(${pessoa.id})">Add viagem</button>`;
-        let viagens = usuario.viagens;
-        let viagensHtml = "";
+  usuarios.forEach(u => {
+    html += `
+      <tr>
+        <td>
+          <button onclick="excluirUsuario(${u.id})">Excluir</button>
+          <button onclick="editarUsuario(${u.id})">Editar</button>
+        </td>
+        <td>${u.nome}</td>
+        <td>${u.email}</td>
+      </tr>
+    `;
+  });
 
-        for (let x= 0; x < viagens.length ; x ++)
-        {
-            let viagem = viagens[x];
-            viagensHtml += `<div style="font-size:80%">
-            <b>Partida:</b> ${viagem.dataHoraPartida} </br>
-            <b>Chegada:</b> ${viagem.dataHoraChegada} </br>
-            <b>Destino:</b> ${viagem.destino} </br>
-            <button onclick="removerViagem(${pessoa.id},${viagem.id})">Excluir viagem</button> </br>
-            </br>
-            </div>`;
-        }
-
-        html += `
-        <tr>
-            <td>${excluir}<br/>${editar}<br/>${viagemBtn}</td>
-            <td>${usuario.nome}</td>
-            <td>${usuario.email}</td>
-            <td>${pessoa.idade}</td>
-            <td>${pessoa.cidade}</td>
-            <td>${pessoa.siglaUf}</td>
-            <td>${viagensHtml}</td>
-        </tr>
-        `;
-    }
-
-    document.getElementById('tbody-pessoas').innerHTML = html;
+  document.getElementById('tbody-pessoas').innerHTML = html;
 }
 
-async function gravarUsuario()
-{
-    let id = pegarParametro('id');
-    let method = id == null ? 'POST' : 'PUT';
-    let url = id == null ? "/usuario" : "/usuario/"+id;
+async function gravarUsuario() {
+  let id = pegarParametro('id');
+  let method = id ? 'PUT' : 'POST';
+  let url = id ? `/usuario/${id}` : '/usuario';
 
-    let pessoa = {
-        "nome": document.getElementById('nome').value,
-        "cpf": document.getElementById('cpf').value,
-        "idade": document.getElementById('idade').value,
-        "cidade": document.getElementById('cidade').value,
-        "siglaUf": document.getElementById('siglaUf').value
-    };
-    
-    const myHeaders = new Headers();
-    myHeaders.append("Content-Type", "application/json");
-    myHeaders.append('user', user);
-    myHeaders.append('password', password);
+  let usuario = {
+    nome: document.getElementById('nome').value,
+    email: document.getElementById('email').value,
+    senha: document.getElementById('senha').value
+  };
 
-    const options = {
-        method: method,
-        body: JSON.stringify(usuario),
-        headers: myHeaders,
-        redirect: "follow"
-    };
+  const headers = new Headers();
+  headers.append("Content-Type", "application/json");
+  headers.append('user', user);
+  headers.append('password', password);
 
-    let result = await fetch(apiUrl+url, options);
-    let pessoaResult = await result.json();
-    console.log(pessoaResult);
+  const options = {
+    method: method,
+    body: JSON.stringify(usuario),
+    headers: headers
+  };
 
-    if (pessoaResult.nome)
-    {
-        alert("Usuario cadastrado com sucesso!");
-        window.location = "index.html"
-    }
-    else
-    {
-        //pessoaResult.erros
-        alert("Erro ao cadastrar usuario!");
-    }
+  const response = await fetch(apiUrl + url, options);
+  const data = await response.json();
 
-    console.log(usuario);
+  if (data.nome) {
+    alert("Usuário salvo com sucesso!");
+    window.location = "index.html";
+  } else {
+    alert("Erro ao salvar usuário: " + (data.erros ? data.erros.join(', ') : 'Erro desconhecido'));
+  }
 }
 
-function pressEnter()
-{
-    if (event.key === 'Enter')
-    {
-        gravarPessoa();
-    } 
+
+
+async function excluirUsuario(id) {
+  if (!confirm("Deseja realmente excluir?")) return;
+
+  const headers = new Headers();
+  headers.append('user', user);
+  headers.append('password', password);
+
+  const response = await fetch(apiUrl + "/usuario/" + id, {
+    method: "DELETE",
+    headers: headers
+  });
+
+  const result = await response.json();
+
+  if (result.okay) {
+    alert("Usuário excluído!");
+    listarUsuario(); 
+  } else {
+    alert("Erro ao excluir usuário!");
+  }
 }
 
-async function excluirUsuario(id)
-{
-    if (confirm("Deseja realmente excluir?"))
-    {
-        const myHeaders = new Headers();
-        myHeaders.append('user', user);
-        myHeaders.append('password', password);
-        
-        const options = {
-            method: "DELETE",
-            redirect: "follow",
-            headers: myHeaders
-        };
-        
-        let result = await fetch(apiUrl+"/usuario/"+id, options)
-        let json = await result.json();
-
-        console.log(json);
-
-        if (json.okay = true)
-        {
-            alert("Usuario excluído com sucesso!");
-            window.location.reload();
-        }
-        else
-        {
-            alert("Problemas em excluir o usuario!");
-        }
-
-        console.log(json);
-    }
+function editarUsuario(id) {
+  window.location = "usuario.html?id=" + id;
 }
 
-async function editarUsuario(id)
-{
-    window.location = "usuario.html?id="+id;
+function pegarParametro(parametro) {
+  const urlParams = new URLSearchParams(window.location.search);
+  return urlParams.get(parametro);
 }
 
-function pegarParametro(parametro)
-{
-    const queryString = window.location.search;
-    const urlParams = new URLSearchParams(queryString);
-    return urlParams.get(parametro)
+async function carregarUsuario() {
+  let id = pegarParametro('id');
+  if (!id) return;
+
+  const headers = new Headers();
+  headers.append('user', user);
+  headers.append('password', password);
+
+  const options = {
+    method: "GET",
+    headers: headers
+  };
+
+  const response = await fetch(apiUrl + `/usuario/${id}`, options);
+  const usuario = await response.json();
+
+  if (usuario.nome) {
+    document.getElementById('nome').value = usuario.nome;
+    document.getElementById('email').value = usuario.email;
+    document.getElementById('senha').value = usuario.senha;
+  }
 }
 
-async function carregarUsuario()
-{
-    let id = pegarParametro('id');
+window.onload = () => {
+  carregarUsuario();
+};
 
-    if (id != null)
-    {
-        document.getElementById('h1').innerHTML = 'Editar usuario';
+async function criarPedido(usuario_id) {
+  const headers = new Headers();
+  headers.append("Content-Type", "application/json");
 
-        const myHeaders = new Headers();
-        myHeaders.append('user', user);
-        myHeaders.append('password', password);
+  const body = {
+    usuario_id: usuario_id,
+    data_criacao: new Date().toISOString()
+  };
 
-        const options = {
-            method: "GET",
-            headers: myHeaders
-        };
+  const options = {
+    method: "POST",
+    headers: headers,
+    body: JSON.stringify(body)
+  };
 
-        let result = await fetch(apiUrl+"/usuario/"+id, options);
-        let pessoa = await result.json();
+  const response = await fetch(apiUrl + "/pedido", options);
+  const pedido = await response.json();
 
-        document.getElementById('nome').value = usuario.nome;
-        document.getElementById('cpf').value = usuario.cpf;
-        document.getElementById('idade').value = usuario.idade;
-        document.getElementById('cidade').value = usuario.cidade;
-        setSelectValue('siglaUf', usuario.siglaUf);
-    }
+  if (pedido.id) {
+    alert("Pedido criado com sucesso! ID: " + pedido.id);
+
+  } else {
+    alert("Erro ao criar pedido.");
+  }
 }
 
-function setSelectValue(id, inVal)
-{
-    let dl = document.getElementById(id);
-    let el = 0;
+async function adicionarProdutoAoPedido(pedido_id, produto_id, quantidade) {
+  const headers = new Headers();
+  headers.append("Content-Type", "application/json");
 
-    for (let i=0; i<dl.options.length; i++)
-    {
-        console.log(dl.options[i])
-        if (dl.options[i].value == inVal)
-        {
-            el=i;
-            break;
-        }
-    }
-    console.log(el);
-    dl.selectedIndex = el;
-}
+  const body = {
+    produto_id,
+    quantidade
+  };
 
-async function carregarEstados()
-{
-    const url = "https://brasilapi.com.br/api/ibge/uf/v1";
-    let resultado = await fetch(url);
-    let estados = await resultado.json();
-    let html = '';
-    
-    for (let i=0; i<estados.length; i++)
-    {
-        let estado = estados[i];
-        
-        html += `<option value="${estado.sigla}">
-            ${estado.nome}
-            </option>`;
-    }
+  const options = {
+    method: "POST",
+    headers,
+    body: JSON.stringify(body)
+  };
 
-    document.getElementById('siglaUf').innerHTML = html;
-}
+  const response = await fetch(`${apiUrl}/pedido/${pedido_id}/produto`, options);
+  const result = await response.json();
 
-function addViagem(id)
-{
-    window.location = 'viagem.html?id='+id;
-}
-
-async function gravarViagem()
-{
-    let id = pegarParametro('id');
-    const myHeaders = new Headers();
-    myHeaders.append("Content-Type", "application/json");
-    myHeaders.append('user', user);
-    myHeaders.append('password', password);
-
-    const raw = {
-        "destino": document.getElementById('destino').value,
-        "dataHoraPartida": document.getElementById('partida').value,
-        "dataHoraChegada": document.getElementById('chegada').value
-    };
-
-    console.log(raw);
-    
-    const options = {
-        method: "POST",
-        headers: myHeaders,
-        body: JSON.stringify(raw),
-        redirect: "follow"
-    };
-
-    let result = await fetch(apiUrl+"/usuario/"+id+"/adicionarviagem", options)
-    let json = await result.json();
-
-    if ( json.nome )
-    {
-        alert("Viagem adicionada com sucesso!");
-        window.location = "index.html";
-    }
-    else
-    {
-        alert("Deu problema filhote!");
-    }
-}
-
-async function removerViagem(id, idViagem)
-{
-    const myHeaders = new Headers();
-    myHeaders.append('user', user);
-    myHeaders.append('password', password);
-
-    const options = {
-        method: "POST",
-        redirect: "follow",
-        headers: myHeaders
-    };
-
-    let result = await fetch(apiUrl+"/usuario/"+id+"/removerviagem/"+idViagem, options)
-    let json = await result.json();
-
-    console.log(json);
-
-    if ( json.okay = true )
-    {
-        alert("Viagem removida com sucesso!");
-        window.location = "index.html";
-    }
-    else
-    {
-        alert("Deu problema filhote!");
-    }
+  if (result.okay) {
+    alert("Produto adicionado com sucesso!");
+  } else {
+    alert("Erro ao adicionar produto!");
+  }
 }
 

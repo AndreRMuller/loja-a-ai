@@ -1,41 +1,35 @@
-<html>
-    <head>
-        <title>Adicionar cadastro</title>
-    </head>
-    <body style="font-family: Arial;">
-        <h1 id="h1">Adicionar cadastro</h1>
-        <label for="nome" style="display:inline-block;width:100px">Nome</label>
-        <input id="nome" />
-        <br/>
-        <br/>
-        <label for="cpf" style="display:inline-block;width:100px">CPF</label>
-        <input id="cpf" maxlength="11" />
-        <br/>
-        <br/>
-        <label for="idade" style="display:inline-block;width:100px">Idade</label>
-        <input id="idade" />
-        <br/>
-        <br/>
-        <label for="siglaUf" style="display:inline-block;width:100px">UF</label>
-        <select id="siglaUf" >
-        </select>
-        <br/>
-        <br/>
-        <label for="cidade" style="display:inline-block;width:100px">Cidade</label>
-        <input id="cidade" />
-        <br/>
-        <br/>
-        <button onclick="gravarUsuario()">Gravar usuario</button>
-    </body>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <title>Cadastro de Usuário</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        label { display: inline-block; width: 100px; margin-bottom: 10px; }
+        input { width: 250px; padding: 5px; margin-bottom: 10px; }
+        button { padding: 8px 15px; }
+    </style>
+</head>
+<body>
+    <h1 id="h1">Adicionar usuário</h1>
+
+    <label for="nome">Nome:</label>
+    <input type="text" id="nome" /><br/>
+
+    <label for="email">E-mail:</label>
+    <input type="email" id="email" /><br/>
+
+    <label for="senha">Senha:</label>
+    <input type="password" id="senha" /><br/>
+
+    <button onclick="gravarUsuario()">Salvar</button>
+
     <script src="usuario.js"></script>
     <script>
-        async function start()
-        {
-            verificaLogin();
-            await carregarEstados();
-            carregarUsuario();
-          
+        async function start() {
+            await carregarUsuario();
         }
-        start();
+        window.onload = start;
     </script>
+</body>
 </html>

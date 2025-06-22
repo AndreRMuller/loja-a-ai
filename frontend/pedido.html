@@ -1,0 +1,37 @@
+<html>
+<head>
+  <title>Pedidos do Usuário</title>
+</head>
+<body style="font-family: Arial;">
+  <h1>Meus Pedidos</h1>
+  <div id="pedidos-container"></div>
+
+  <script src="usuario.js"></script>
+  <script>
+    async function carregarPedidos() {
+      verificaLogin();
+
+      const id = localStorage.getItem('usuario_id'); // você pode salvar isso no login
+      const headers = new Headers();
+      headers.append("Content-Type", "application/json");
+
+      const res = await fetch(apiUrl + "/pedido/usuario/" + id, { method: "GET", headers });
+      const pedidos = await res.json();
+
+      let html = "";
+      pedidos.forEach(p => {
+        html += `<h3>Pedido #${p.id} - ${new Date(p.data_criacao).toLocaleString()}</h3>`;
+        html += "<ul>";
+        p.produtos.forEach(prod => {
+          html += `<li>${prod.nome} - R$ ${prod.preco} x ${prod.quantidade}</li>`;
+        });
+        html += "</ul><hr/>";
+      });
+
+      document.getElementById("pedidos-container").innerHTML = html;
+    }
+
+    carregarPedidos();
+  </script>
+</body>
+</html>

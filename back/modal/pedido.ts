@@ -149,5 +149,29 @@ public async addProduto(produto_id: number, quantidade: number): Promise<void> {
   `;
   await dbQuery(sql, [this.id, produto_id, quantidade]);
 }
+
+static async buscarProdutos(id_pedido: number) {
+  const sql = `
+    SELECT p.id, p.nome, p.preco, pp.quantidade
+    FROM pedido_produto pp
+    JOIN produto p ON p.id = pp.id_produto
+    WHERE pp.id_pedido = $1
+  `;
+  const rows = await dbQuery(sql, [id_pedido]);
+  return rows;
+}
+
+static async criar(usuario_id: number): Promise<Pedido | null> {
+  const sql = `INSERT INTO pedido (usuario_id) VALUES ($1) RETURNING *;`;
+  const result = await dbQuery(sql, [usuario_id]);
+
+  if (result.length > 0) {
+    const pedido = new Pedido();
+    Object.assign(pedido, result[0]);
+    return pedido;
+  }
+
+  return null;
+}
     
 };
